@@ -4,7 +4,7 @@ This is code for **similar items** based on the **Jaccard Similarity** for the p
 
 ## Idea
 
-First we clean the dataset using the **data.ipynb** notebook. The resoult of that will be *data/skincare.cvs* file that only contains skincare products.
+First we clean the dataset using the **data.ipynb** notebook. The result of that will be *data/skincare.cvs* file that only contains skincare products.
 
 Now we perform ***similar items search*** based on the **Jaccard Similarity** by simply running in console:
 

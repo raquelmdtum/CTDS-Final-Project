@@ -1,81 +1,74 @@
-# Product Recommendation System: README
-
-## Introduction
-
-This repository contains code for a **similar items** search based on **Jaccard Similarity**, as part of a project to identify product recommendations in the [Sephora Skincare Dataset](https://www.kaggle.com/datasets/nadyinky/sephora-products-and-skincare-reviews/data). By leveraging product attributes, we aim to find alternative options for any given product in the dataset.
-
----
+# Recommendation System for Sephora Skincare Products
 
 ## Project Overview
 
-This project combines sentiment analysis, association rule mining, and similarity search techniques to develop a hybrid recommendation system. The system helps identify related products and suggests alternatives for skincare items.
+This repository contains the implementation of a Recommendation System for Sephora skincare products, leveraging data from the [Sephora dataset](https://www.kaggle.com/datasets/nadyinky/sephora-products-and-skincare-reviews/data). The system focuses on recommending products based on customer reviews, frequent itemsets, and product similarity.
 
----
+The recommendations are designed to suggest products that users are likely to enjoy, based on:
+1. Products frequently reviewed together with positive sentiment.
+2. Products similar to the recommended items, identified through ingredient and product similarity.
 
-## Key Components
+## Project Structure
 
-### 1. **Sentiment Analysis to Refine Data**
-- **Goal**: Filter out products users didn’t like, focusing on items they enjoyed.  
-- **Steps**:
-  1. Remove all one- and two-star reviews (negative sentiment).
-  2. Perform sentiment analysis on three-star reviews to classify them as positive or negative.  
-- **Purpose**: Refine the data to generate association rules that reflect *"if you liked this, you might also like this"* instead of *"if you bought this, you might also buy this."*
+### Folders
 
-### 2. **Association Rule Mining with the A-Priori Algorithm**
-- **Goal**: Identify patterns of co-purchased or co-liked products.  
-- **Method**: Use the A-Priori algorithm to generate association rules that recommend related products.
-- **Challenge**: Balancing dataset size to ensure rules are both meaningful and representative.
+- **`data/`**: Contains raw, unprocessed data files.
+    -  `product_info.csv`: Metadata for skincare products.
+    - `reviews_0-250.csv`: Raw reviews directly from teh Kaggle dataset.
+    - Other similar raw review files (`reviews_250-500.csv`, etc.).
+- **`processed_data/`**: Contains pre-processed files for use in analysis.
+    - `skincare.csv`: Cleaned dataset of skincare products.
+    - `reviews_0-250.csv`: Processed reviews (split for scalability).
+    - Other similar processed review files (`reviews_250-500.csv`, etc.).
+    - `combined_reviews.csv`: Includes all reviews already processed.
+    - `positive_reviews.csv` and `negative_reviews.csv`: File outputs of the sentiment analysis performed in all relevant product reviews.
 
-### 3. **Similar Items Search Using Jaccard Similarity**
-- **Goal**: Recommend "dupes" based on similarity in product attributes, even when association rules are unavailable.
-- **Steps**:
-  1. Clean the dataset using the `data.ipynb` notebook, producing a refined `data/skincare.csv` file with only skincare products.
-  2. Run the `similar_items.py` script and input the `product_id` of the desired item:
-     ```bash
-     python similar_items.py
-     ```
-  3. For the selected product:
-     - Retrieve its details.
-     - Filter products within the same category (clustering).
-     - Compute **Jaccard Similarity** using the `highlights` column.
-     - Rank and display the most similar products within the same `secondary_category`.
+### Files
 
----
+1. Data Cleaning, Preprocessing and Exploratory Data Analysis (EDA)
+- **`data_processing_eda.ipynb`**: Notebook for cleaning and preprocessing the dataset. Includes exploratory data analysis (EDA).
+2. **Sentiment Analysis**
+- **`sentiment_analysis.ipynb`**: Identifies the sentiment of 3-star reviews to ensure only positive ones are used in recommendation logic.
+3. Frequent Items
+- **`frequent_itemsets.ipynb`**: Implements Apriori algorithm to mine frequent itemsets from positively-rated reviews and generate association rules.
+4. **Similar Items**
+- **TODO**
 
-## Applications
-1. **E-Commerce Recommendations**:
-   - Suggest related products or dupes based on association rules and similarity measures.
-2. **Product Discovery**:
-   - Help users find affordable or similar alternatives to popular products.
+## How to Use
 
----
+1. **Run Data Cleaning and Preprocessing:**
+- Use `data_processing_eda.ipynb` to clean the dataset and preprocess reviews.
+2. **Mine Frequent Items:**
+- Execute `frequent_itemsets.ipynb` to generate association rules.
+3. **Perform Sentiment Analysis:**
+- Run `sentiment_analysis.ipynb` to filter 3-star positive reviews.
+4. **Find Similar Items:**
+- Use `similar_items.py`, `ingredient-similarity.ipynb` and `sandbox_simmilar_items.ipynb` to compute similarity between products.
+5. **Generate Recommendations:**
+- Combine the frequent itemsets and similarity measures to recommend products.
 
 ## Example Workflow
 
-1. **Sentiment Filtering**:  
-   Input: A dataset of products and reviews.  
-   Output: A refined dataset containing only positively rated products for each user.  
+1. Sentiment Filtering:
+Input: A dataset of products and reviews.
+Output: A refined dataset containing only positively rated products for each user.
 
-2. **Association Rules**:  
-   Input: Refined dataset of liked products.  
-   Output: Rules like *"If you liked Product A, you might also like Product B."*  
+2. Association Rules:
+Input: Refined dataset of liked products.
+Output: Rules like "If you liked Product A, you might also like Product B."
 
-3. **Similar Items Search**:  
-   Input: A `product_id` of interest.  
-   Output: Ranked list of similar products within the same category.  
-
----
+3. Similar Items Search:
+Input: A product_id of interest.
+Output: Ranked list of similar products within the same category.
 
 ## Challenges and Considerations
-- **Sentiment Analysis**:
-  - Challenges with nuanced language (e.g., *"not bad"* vs. *"I didn’t love this"*).
-  - Tendency for less extreme reviews, making classification more ambiguous.
-- **Association Rules**:
-  - Balancing data volume for meaningful yet representative rules.
-- **Similarity Search**:
-  - Ensuring "similar items" align with user expectations in both functionality and attributes.
-
----
+- Sentiment Analysis:
+    - Challenges with nuanced language (e.g., "not bad" vs. "I didn’t love this").
+    - Tendency for less extreme reviews, making classification more ambiguous.
+- Association Rules:
+    - Balancing data volume for meaningful yet representative rules.
+- Similarity Search:
+    - Ensuring "similar items" align with user expectations in both functionality and attributes.
 
 ## Future Work
 - Enhance sentiment analysis for greater contextual understanding.

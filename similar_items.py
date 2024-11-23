@@ -1,6 +1,8 @@
 # this file consists of the code used for similar items
 
 import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 def jaccard_similarity(set_a, set_b):
    """
@@ -10,7 +12,7 @@ def jaccard_similarity(set_a, set_b):
    union = len(set_a.union(set_b))
    return intersection / union if union != 0 else 0.0
 
-def similarity_search(df, token_list):
+def similarity_search_highlights(df, token_list):
    """
    Perform similarity search based on Jaccard similarity between df and a token list.
    
@@ -38,12 +40,92 @@ def similarity_search(df, token_list):
       similarity_scores.append((product_id, title, similarity_score, (row['highlights'])))
    
    # Convert the list of similarity scores to a DataFrame
-   similarity_df = pd.DataFrame(similarity_scores, columns=['product_id', 'product_name', 'similarity_score', 'highlights'])
+   similarity_df = pd.DataFrame(similarity_scores, columns=['product_id', 'product_name', 'similarity_score_highlights', 'highlights'])
    
    # Sort the DataFrame by the 'similarity_score' column in descending order
-   similarity_df_sorted = similarity_df.sort_values(by='similarity_score', ascending=False).reset_index(drop=True)
+   similarity_df_sorted = similarity_df.sort_values(by='similarity_score_highlights', ascending=False).reset_index(drop=True)
+   
+   similarity_df_sorted['rank_highlights'] = range(1, len(similarity_df_sorted) + 1)
    
    return similarity_df_sorted
+
+def custom_tokenizer(text):
+   return text.split(", ")
+
+def similarity_search_ingredients(query, df):
+   """
+   Perform a similarity search based on cosine similarity of TF-IDF vectors.
+
+   Parameters:
+   - query (str): The input query string.
+   - df (pd.DataFrame): A DataFrame containing 'id' and 'ingredients' columns.
+
+   Returns:
+   - results_df (pd.DataFrame): Rows from the original DataFrame sorted by similarity.
+   """
+   # Initialize TfidfVectorizer with a custom tokenizer (adjust lowercase as needed)
+   vectorizer = TfidfVectorizer(tokenizer=custom_tokenizer, lowercase=False)
+
+   # Extract the 'ingredients' column
+   ingredients = df['ingredients']
+
+   # Fit and transform the ingredients
+   tfidf_matrix = vectorizer.fit_transform(ingredients)
+
+   # Transform the query into the TF-IDF space
+   query_tfidf = vectorizer.transform([query])
+
+   # Compute cosine similarity between the query and all documents
+   similarities = cosine_similarity(query_tfidf, tfidf_matrix).flatten()
+
+   # Add similarity scores to the DataFrame
+   df['similarity_score_ingredients'] = similarities
+
+   # Sort the DataFrame by similarity scores in descending order
+   results_df = df.sort_values(by='similarity_score_ingredients', ascending=False).reset_index(drop=True)
+   
+   results_df['rank_ingredients'] = range(1, len(results_df) + 1)
+
+   return results_df
+
+def reciprocal_rank_fusion(df_highlights, df_ingredients, k=60):
+   """
+   Compute Reciprocal Rank Fusion (RRF) scores based on rank_highlights and rank_ingredients.
+
+   Parameters:
+   - df_highlights (pd.DataFrame): DataFrame containing 'product_id', 'rank_highlights', and other relevant columns.
+   - df_ingredients (pd.DataFrame): DataFrame containing 'product_id', 'rank_ingredients', and other relevant columns.
+   - k (int): A constant for RRF computation (default=60).
+
+   Returns:
+   - combined_df (pd.DataFrame): A new DataFrame with overall RRF scores and combined ranking.
+   """
+   # Merge the two DataFrames on 'product_id'
+   merged_df = pd.merge(
+      df_highlights[['product_id', 'rank_highlights']],
+      df_ingredients[['product_id', 'rank_ingredients']],
+      on='product_id',
+      how='outer'
+   )
+
+   # Fill missing ranks with a large value (e.g., very low relevance)
+   merged_df['rank_highlights'] = merged_df['rank_highlights'].fillna(float('inf'))
+   merged_df['rank_ingredients'] = merged_df['rank_ingredients'].fillna(float('inf'))
+
+   # Compute the RRF score
+   merged_df['rrf_score'] = (
+      1 / (k + merged_df['rank_highlights']) +
+      1 / (k + merged_df['rank_ingredients'])
+   )
+
+   # Sort by the RRF score in descending order
+   merged_df = merged_df.sort_values(by='rrf_score', ascending=False).reset_index(drop=True)
+
+   # Add a new rank based on the RRF score
+   merged_df['overall_rank'] = range(1, len(merged_df) + 1)
+
+   return merged_df
+
 
 if __name__ == "__main__":
    """
@@ -56,7 +138,7 @@ if __name__ == "__main__":
    print("Running similarity search...")
    
    # load the data
-   df = pd.read_csv("data/skincare.csv")
+   df = pd.read_csv("processed_data/skincare.csv")
    
    # get the selected product
    product = df[df['product_id'] == product_id_input]
@@ -69,7 +151,7 @@ if __name__ == "__main__":
    category_df = df[(df['secondary_category'] == product_category) & (df['product_id'] != product_id_input)][['product_id','product_name', 'highlights']]
    
    # perform similarity search using Jaccard Similarity
-   similarity_results_sorted = similarity_search(category_df, token_list)
+   similarity_results_sorted = similarity_search_highlights(category_df, token_list)
    
    print(similarity_results_sorted)
    

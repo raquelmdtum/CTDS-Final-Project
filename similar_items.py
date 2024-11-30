@@ -52,7 +52,7 @@ def similarity_search_highlights(df, token_list):
 def custom_tokenizer(text):
    return text.split(", ")
 
-def similarity_search_ingredients(query, df):
+def similarity_search_ingredients(df, query):
    """
    Perform a similarity search based on cosine similarity of TF-IDF vectors.
 
@@ -63,6 +63,8 @@ def similarity_search_ingredients(query, df):
    Returns:
    - results_df (pd.DataFrame): Rows from the original DataFrame sorted by similarity.
    """
+   results_df = df.copy()
+   
    # Initialize TfidfVectorizer with a custom tokenizer (adjust lowercase as needed)
    vectorizer = TfidfVectorizer(tokenizer=custom_tokenizer, lowercase=False)
 
@@ -79,10 +81,10 @@ def similarity_search_ingredients(query, df):
    similarities = cosine_similarity(query_tfidf, tfidf_matrix).flatten()
 
    # Add similarity scores to the DataFrame
-   df['similarity_score_ingredients'] = similarities
+   results_df['similarity_score_ingredients'] = similarities
 
    # Sort the DataFrame by similarity scores in descending order
-   results_df = df.sort_values(by='similarity_score_ingredients', ascending=False).reset_index(drop=True)
+   results_df = results_df.sort_values(by='similarity_score_ingredients', ascending=False).reset_index(drop=True)
    
    results_df['rank_ingredients'] = range(1, len(results_df) + 1)
 
@@ -126,6 +128,43 @@ def reciprocal_rank_fusion(df_highlights, df_ingredients, k=60):
 
    return merged_df
 
+def get_similar_items(product_id, df, n = 5):
+   """
+   Retrieve the top N products most similar to a given product based on highlights and ingredients.
+
+   This function takes a product ID, performs similarity searches on the product's highlights and ingredients, 
+   and combines the results using a reciprocal rank fusion algorithm. It returns the top N most similar products.
+
+   Parameters:
+   ----------
+   product_id : int or str
+      The ID of the product for which similar items are being searched.
+   n : int, optional
+      The number of similar products to return. Default is 5.
+
+   Returns:
+    - merged_results (pd.DataFrame): A new DataFrame containing top n similar items
+   """
+
+   # get the selected product
+   product = df[df['product_id'] == product_id]
+
+   # get the product highlights and ingredients
+   product_highlights =  list(product['highlights'])[0].split(", ")
+   product_ingredients = str(product['ingredients'])
+
+   # remove the product I am searching for
+   df = df[(df['product_id'] != product_id)]#[['product_id','product_name', 'highlights']]
+
+   # perform similarity searches
+   highlights_similarity_results = similarity_search_highlights(df, product_highlights)
+   ingredients_similarity_results = similarity_search_ingredients(df, product_ingredients)
+
+   # combine similarity searches with reciprocal rank fusion algorithm
+   merged_results = reciprocal_rank_fusion(highlights_similarity_results, ingredients_similarity_results)
+   
+   # Return only the top-n products
+   return merged_results[:n]
 
 if __name__ == "__main__":
    """

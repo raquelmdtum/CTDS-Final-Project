@@ -26,29 +26,20 @@ The recommendations are designed to suggest products that users are likely to en
 
 ### Files
 
-1. Data Cleaning, Preprocessing and Exploratory Data Analysis (EDA)
-- **`data_processing_eda.ipynb`**: Notebook for cleaning and preprocessing the dataset. Includes exploratory data analysis (EDA).
-2. **Sentiment Analysis**
-- **`sentiment_analysis.ipynb`**: Identifies the sentiment of 3-star reviews to ensure only positive ones are used in recommendation logic.
-3. **Frequent Items**
-- **`frequent_itemsets.ipynb`**: Implements Apriori algorithm to mine frequent itemsets from positively-rated reviews and generate association rules.
-4. **Similar Items**
-- **`similar_items.ipynb`**: Recommends similar skincare products based on highlights and ingredients using similarity measures and Reciprocal Rank Fusion.
-5. **Recommendation System**
-- **`recommender.ipynb`** and **`utility.py`**: Simulate the entire recommendation process using association rules and similarity searches to recommend skincare products.
+- **`recommendation_system.ipynb`**: A single comprehensive notebook implementing the entire workflow for the recommendation system. It integrates data cleaning, exploratory data analysis (EDA), sentiment analysis, frequent itemset mining, similarity search, and recommendation logic. Each step aligns with the following components:
+  1. **Data Cleaning and Preprocessing:** Processes raw data into usable formats.
+  2. **Sentiment Analysis:** Filters reviews to include only positively rated ones.
+  3. **Frequent Items:** Mines association rules from reviews with positive sentiment.
+  4. **Similar Items:** Identifies similar skincare products using Reciprocal Rank Fusion on product highlights and ingredients.
+  5. **Recommendation System:** Combines association rules and similarity measures to recommend products.
+
+- **`utility.py`**: A Python script providing reusable functions for key tasks, such as preprocessing rules, similarity calculations, and recommendation generation.
 
 ## How to Use
 
-1. **Run Data Cleaning and Preprocessing:**
-- Use `data_processing_eda.ipynb` to clean the dataset and preprocess reviews.
-2. **Perform Sentiment Analysis:**
-- Run `sentiment_analysis.ipynb` to filter 3-star positive reviews.
-3. **Mine Frequent Items:**
-- Execute `frequent_itemsets.ipynb` to generate association rules.
-4. **Find Similar Items:**
-- Use `similar_items.ipynb` to compute the similarity between products.
-5. **Generate Recommendations:**
-- Combine the frequent itemsets and similarity measures through the `recommender.ipynb` notebook to recommend products.
+- **Run the Comprehensive Notebook:**
+   - Open and execute `recommendation_system.ipynb` to clean data, analyze reviews, mine association rules, find similar products, and generate recommendations.
+
 
 ## Example Workflow
 

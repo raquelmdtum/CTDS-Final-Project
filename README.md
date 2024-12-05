@@ -26,7 +26,7 @@ The recommendations are designed to suggest products that users are likely to en
 
 ### Files
 
-- **`imports.py`**: A Python script importing all necessary libraries used in **`recommendation_system.ipynb`**.
+- **`imports.py`**: A Python file importing all necessary libraries to be used in **`recommendation_system.ipynb`**.
 
 - **`recommendation_system.ipynb`**: A single comprehensive notebook implementing the entire workflow for the recommendation system. It integrates data cleaning, exploratory data analysis (EDA), sentiment analysis, frequent itemset mining, similarity search, and recommendation logic. Each step aligns with the following components:
   1. **Data Cleaning and Preprocessing:** Processes raw data into usable formats.

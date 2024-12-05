@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from tqdm import tqdm
-from utility import *
 import plotly.io as pio
 import tensorflow as tf
 import plotly.express as px

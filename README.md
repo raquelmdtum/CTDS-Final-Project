@@ -26,14 +26,14 @@ The recommendations are designed to suggest products that users are likely to en
 
 ### Files
 
+- **`imports.py`**: A Python script importing all necessary libraries used in **`recommendation_system.ipynb`**.
+
 - **`recommendation_system.ipynb`**: A single comprehensive notebook implementing the entire workflow for the recommendation system. It integrates data cleaning, exploratory data analysis (EDA), sentiment analysis, frequent itemset mining, similarity search, and recommendation logic. Each step aligns with the following components:
   1. **Data Cleaning and Preprocessing:** Processes raw data into usable formats.
   2. **Sentiment Analysis:** Filters reviews to include only positively rated ones.
   3. **Frequent Items:** Mines association rules from reviews with positive sentiment.
   4. **Similar Items:** Identifies similar skincare products using Reciprocal Rank Fusion on product highlights and ingredients.
   5. **Recommendation System:** Combines association rules and similarity measures to recommend products.
-
-- **`utility.py`**: A Python script providing reusable functions for key tasks, such as preprocessing rules, similarity calculations, and recommendation generation.
 
 ## How to Use
 

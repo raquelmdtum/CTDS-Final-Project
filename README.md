@@ -35,6 +35,8 @@ The recommendations are designed to suggest products that users are likely to en
   4. **Similar Items:** Identifies similar skincare products using Reciprocal Rank Fusion on product highlights and ingredients.
   5. **Recommendation System:** Combines association rules and similarity measures to recommend products.
 
+- **`group12_report.pdf`**: Final report of the present project, including a detailed explanation of how we developed the recommendation system, its analysis, methodology, results, and future work.
+
 ## How to Use
 
 - **Run the Comprehensive Notebook:**
